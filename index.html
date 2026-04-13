@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Kalkulator Keuangan</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* BACKGROUND PUTIH */
+    background: #ffffff;
+}
+
+/* LAPTOP */
+.laptop {
+    position: relative;
+    width: 750px;
+    transform: perspective(1200px) rotateX(8deg);
+}
+
+/* FRAME HITAM */
+.frame {
+    background: #111;
+    padding: 12px;
+    border-radius: 18px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+
+/* CAMERA */
+.camera {
+    width: 10px;
+    height: 10px;
+    background: #000;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+}
+
+/* SCREEN DENGAN BACKGROUND GAMBAR */
+.screen {
+    border-radius: 10px;
+    padding: 20px;
+    border: 6px solid #000;
+
+    /* BACKGROUND DALAM LAPTOP */
+    background: url('https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3OHNvbXowbnYwcGc4ZDkyMDEzOWhqZ2QxNjViYnBhMnlubDVjOWE3ayZlcD12MV9naWZzX3JlbGF0ZWQmY3Q9Zw/SbdrXHzWCKKOAug9hL/giphy.gif')
+                no-repeat center center;
+    background-size: cover;
+    position: relative;
+}
+
+/* overlay biar teks kebaca */
+.screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    border-radius: 10px;
+}
+
+/* isi di atas overlay */
+.container {
+    position: relative;
+    color: white;
+}
+
+/* BASE */
+.base {
+    width: 115%;
+    height: 80px;
+    background: linear-gradient(to bottom, #222, #000);
+    border-radius: 0 0 25px 25px;
+    margin-left: -7.5%;
+    margin-top: -5px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+}
+
+/* KEYBOARD */
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(14, 1fr);
+    gap: 4px;
+    padding: 10px 15px;
+}
+
+.key {
+    height: 10px;
+    background: #333;
+    border-radius: 2px;
+}
+
+/* TOUCHPAD */
+.touchpad {
+    width: 120px;
+    height: 8px;
+    background: #555;
+    margin: 5px auto;
+    border-radius: 5px;
+}
+
+/* FORM */
+h2 {
+    text-align: center;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background: #00c6ff;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #0072ff;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(0,0,0,0.7);
+    text-align: center;
+}
+
+.aman { color: #00ffcc; }
+.cukup { color: yellow; }
+.boros { color: red; }
+
+.pengeluaran-item {
+    display: flex;
+    gap: 5px;
+}
+
+.pengeluaran-item input {
+    flex: 1;
+}
+
+.hapus-btn {
+    background: red;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="laptop">
+
+    <div class="frame">
+        <div class="camera"></div>
+
+        <div class="screen">
+            <div class="container">
+
+                <h2>Kalkulator Keuangan</h2>
+
+                <form method="POST">
+                    <input type="number" name="gaji" placeholder="Masukkan Gaji" required>
+
+                    <h4>📋 Pengeluaran:</h4>
+
+                    <div id="pengeluaran-list">
+                        <div class="pengeluaran-item">
+                            <input type="text" name="nama_pengeluaran[]" placeholder="Contoh: Makan">
+                            <input type="number" name="jumlah_pengeluaran[]" placeholder="Jumlah">
+                            <button type="button" class="hapus-btn" onclick="this.parentElement.remove()">−</button>
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="tambahInput()">+ Tambah Pengeluaran</button>
+                    <button type="submit">Hitung</button>
+                </form>
+
+                {% if hasil is not none %}
+                <div class="result">
+                    Gaji: Rp {{ hasil.gaji }} <br>
+                    Total Pengeluaran: Rp {{ hasil.pengeluaran }} <br>
+                    Sisa: Rp {{ hasil.sisa }} <br><br>
+
+                    {% if status == 'AMAN' %}
+                        <strong class="aman">Investasi bro 👍</strong>
+                    {% elif status == 'CUKUP' %}
+                        <strong class="cukup">Naikkan income ⚠️</strong>
+                    {% else %}
+                        <strong class="boros">BOROS 😭</strong>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+    <!-- BASE -->
+    <div class="base">
+
+        <div class="keyboard">
+            <!-- tombol -->
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div>
+
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div><div class="key"></div>
+            <div class="key"></div><div class="key"></div>
+        </div>
+
+        <div class="touchpad"></div>
+
+    </div>
+
+</div>
+
+<script>
+function tambahInput() {
+    let div = document.createElement("div");
+    div.classList.add("pengeluaran-item");
+
+    div.innerHTML = `
+        <input type="text" name="nama_pengeluaran[]" placeholder="Nama">
+        <input type="number" name="jumlah_pengeluaran[]" placeholder="Jumlah">
+        <button type="button" class="hapus-btn" onclick="this.parentElement.remove()">−</button>
+    `;
+
+    document.getElementById("pengeluaran-list").appendChild(div);
+}
+</script>
+
+</body>
+</html>
